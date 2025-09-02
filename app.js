@@ -73,7 +73,10 @@
   const API_BORDERS_URL = '/api/borders';
   const REMOTE_BORDERS_URL = 'https://unpkg.com/three-globe@2.44.0/example/datasets/ne_110m_admin_0_countries.geojson';
 
+  let bordersLoading = false;
   function loadBorders(){
+    if (bordersLoading) return Promise.resolve();
+    bordersLoading = true;
     return fetch(LOCAL_BORDERS_URL, { cache: 'force-cache' })
       .then(r => { if(!r.ok) throw new Error('local_not_found'); return r.json(); })
       .catch(() => fetch(API_BORDERS_URL).then(r => { if(!r.ok) throw new Error('api_not_found'); return r.json(); }))
@@ -93,15 +96,27 @@
             globe.polygonsData(features);
           }
         }
+        bordersLoading = false;
       })
-      .catch(()=>{/* no borders available; continue without */});
+      .catch(()=>{ bordersLoading = false; /* no borders available; continue without */ });
   }
-  loadBorders();
+  // Do not fetch borders on load; fetched when toggled on
 
   // Layer toggles: borders and graticules
   if(layerBorders){
     layerBorders.addEventListener('change', ()=>{
-      globe.polygonsData(layerBorders.checked ? (window.__WORLD_FEATURES || []) : []);
+      if (layerBorders.checked) {
+        if (window.__WORLD_FEATURES && window.__WORLD_FEATURES.length) {
+          globe.polygonsData(window.__WORLD_FEATURES);
+        } else {
+          loadBorders().catch(()=>{
+            // If borders still unavailable, turn toggle off to avoid repeated 404s
+            layerBorders.checked = false;
+          });
+        }
+      } else {
+        globe.polygonsData([]);
+      }
     });
   }
   if(layerGraticules){
