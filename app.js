@@ -70,13 +70,15 @@
 
   // Load country borders preferring same-origin asset to avoid CORS
   const LOCAL_BORDERS_URL = 'assets/ne_110m_admin_0_countries.geojson';
+  const API_BORDERS_URL = '/api/borders';
   const REMOTE_BORDERS_URL = 'https://unpkg.com/three-globe@2.44.0/example/datasets/ne_110m_admin_0_countries.geojson';
 
   function loadBorders(){
     return fetch(LOCAL_BORDERS_URL, { cache: 'force-cache' })
       .then(r => { if(!r.ok) throw new Error('local_not_found'); return r.json(); })
+      .catch(() => fetch(API_BORDERS_URL).then(r => { if(!r.ok) throw new Error('api_not_found'); return r.json(); }))
       .catch(err => {
-        // Fallback to remote only in localhost/dev to reduce CORS issues in prod
+        // As a last resort in localhost/dev, try remote (may CORS fail in prod)
         const isLocalhost = location.origin.startsWith('http://localhost') || location.origin.startsWith('http://127.0.0.1');
         if(isLocalhost){
           return fetch(REMOTE_BORDERS_URL).then(r=>r.json());
