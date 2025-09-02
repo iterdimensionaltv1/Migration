@@ -338,8 +338,14 @@
     document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeAbout(); });
   }
 
-  // Hide loading overlay on first animation frame
-  if (loadingEl) requestAnimationFrame(()=>{ loadingEl.style.display = 'none'; });
+  // Hide loading overlay robustly
+  function hideLoading(){
+    const el = document.getElementById('loading') || loadingEl;
+    if (el) el.style.display = 'none';
+  }
+  requestAnimationFrame(hideLoading);
+  document.addEventListener('DOMContentLoaded', hideLoading);
+  window.addEventListener('load', hideLoading);
 
   // Kick off
   setYear(parseInt(timeSlider.value,10));
