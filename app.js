@@ -154,6 +154,18 @@
   }
   const ALL_ARCS = window.ROUTES.flatMap(expandRouteToArcs);
 
+  // Create particle-like arc copies per segment to resemble migrating dots
+  function makeParticleCopies(seg){
+    const copies = [];
+    const base = Math.max(1, Math.min(5, seg.magnitude || 1));
+    const n = base * 12; // particles per segment (tune for density)
+    for(let i=0;i<n;i++){
+      copies.push({ ...seg, pid: i, dashOffset: Math.random() });
+    }
+    return copies;
+  }
+  const ALL_PARTICLE_ARCS = ALL_ARCS.flatMap(makeParticleCopies);
+
   // Colors per era + confidence → alpha
   function baseColorFor(d){
     const c = {
@@ -178,14 +190,16 @@
   globe
     .arcsData([])
     .arcColor(colorWithHighlight)
-    .arcStroke(d => ((d.routeId === highlightedRouteId || d.routeId === selectedRouteId) ? 1.3 : 0.9));
+    .arcStroke(d => ((d.routeId === highlightedRouteId || d.routeId === selectedRouteId) ? 1.0 : 0.7))
+    // tiny moving dashes to appear as dots
+    .arcDashLength(0.03)
+    .arcDashGap(1)
+    .arcDashInitialGap(d => d.dashOffset)
+    .arcDashAnimateTime(2000);
 
   // Points at waypoints (origins only for clarity)
-  const points = window.ROUTES.map(r => {
-    const [lat, lon] = r.waypoints[0];
-    return { lat, lng: lon, name: r.name, category: r.category };
-  });
-  globe.pointsData(points);
+  // Remove origin markers to reduce visual clutter
+  globe.pointsData([]);
 
   // --- Timeline state ---
   const minYear = parseInt(timeSlider.min,10);
@@ -215,11 +229,12 @@
               : currentYear < 1500    ? 500
               : 80;
 
-    const arcs = ALL_ARCS.filter(a =>
-      (currentYear >= a.start - tol && currentYear <= a.end + tol) &&
-      layerEnabled(a.category)
+    const activeSegIds = new Set(
+      ALL_ARCS
+        .filter(a => (currentYear >= a.start - tol && currentYear <= a.end + tol) && layerEnabled(a.category))
+        .map(a => a.id)
     );
-
+    const arcs = ALL_PARTICLE_ARCS.filter(p => activeSegIds.has(p.id));
     globe.arcsData(arcs);
 
     // Active list
@@ -258,6 +273,15 @@
   [layerPaleo, layerAncient, layerModern].forEach(el => el.addEventListener('change', render));
 
   playBtn.addEventListener('click', togglePlay);
+  // Map playback speed to particle animation speed as well
+  speedSelect.addEventListener('change', updateArcAnimSpeed);
+  function updateArcAnimSpeed(){
+    const spd = parseInt(speedSelect.value,10);
+    // Slower playback => longer animation time; scale factor
+    const anim = Math.max(600, spd * 4);
+    globe.arcDashAnimateTime(anim);
+  }
+  updateArcAnimSpeed();
   if (resetBtn) {
     resetBtn.addEventListener('click', ()=>{
       selectedRouteId = null;
