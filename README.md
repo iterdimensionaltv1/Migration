@@ -90,6 +90,7 @@ Architecture
 - `migrations.js`: data schema (`SOURCES`, `ROUTES`) and curated routes
 - `styles.css`: glass‑style UI, legend, responsive tweaks
 - External assets: Earth textures from unpkg via Globe.gl examples
+ - Borders: prefer same-origin `assets/ne_110m_admin_0_countries.geojson` to avoid CORS; see `docs/assets.md`
 
 
 Contributing Data

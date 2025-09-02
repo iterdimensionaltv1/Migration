@@ -68,18 +68,33 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // Load country borders (Natural Earth 110m via example CDN)
-  fetch('https://unpkg.com/three-globe/example/datasets/ne_110m_admin_0_countries.geojson')
-    .then(r => r.json())
-    .then(world => {
-      if(world && world.features) {
-        window.__WORLD_FEATURES = world.features;
-        if(!layerBorders || layerBorders.checked){
-          globe.polygonsData(world.features);
+  // Load country borders preferring same-origin asset to avoid CORS
+  const LOCAL_BORDERS_URL = 'assets/ne_110m_admin_0_countries.geojson';
+  const REMOTE_BORDERS_URL = 'https://unpkg.com/three-globe@2.44.0/example/datasets/ne_110m_admin_0_countries.geojson';
+
+  function loadBorders(){
+    return fetch(LOCAL_BORDERS_URL, { cache: 'force-cache' })
+      .then(r => { if(!r.ok) throw new Error('local_not_found'); return r.json(); })
+      .catch(err => {
+        // Fallback to remote only in localhost/dev to reduce CORS issues in prod
+        const isLocalhost = location.origin.startsWith('http://localhost') || location.origin.startsWith('http://127.0.0.1');
+        if(isLocalhost){
+          return fetch(REMOTE_BORDERS_URL).then(r=>r.json());
         }
-      }
-    })
-    .catch(()=>{/* non‑fatal if offline */});
+        throw err;
+      })
+      .then(world => {
+        if(world && (world.features || (world.type==='Topology'))){
+          const features = world.features || world;
+          window.__WORLD_FEATURES = features;
+          if(!layerBorders || layerBorders.checked){
+            globe.polygonsData(features);
+          }
+        }
+      })
+      .catch(()=>{/* no borders available; continue without */});
+  }
+  loadBorders();
 
   // Layer toggles: borders and graticules
   if(layerBorders){
