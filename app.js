@@ -187,6 +187,8 @@
           const cfgRes = await fetch('assets/config.json');
           if(cfgRes.ok){ const cfg = await cfgRes.json(); if(cfg && cfg.packetScale) PACKET_SCALE = cfg.packetScale; }
         }catch(_e){ /* ignore */ }
+        // Re-render with external dataset
+        render();
       }
     }catch(_e){ /* ignore; fallback to built-in */ }
   }
