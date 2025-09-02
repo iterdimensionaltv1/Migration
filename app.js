@@ -27,8 +27,6 @@
     .showAtmosphere(true)
     .atmosphereColor('#88c7ff')
     .atmosphereAltitude(0.25)
-    .showGraticules(true)
-    .graticuleColor('#ffffff18')
     // Country outlines overlay for visual accuracy reference
     .polygonsData([])
     .polygonCapColor(()=>'rgba(0,0,0,0)')
@@ -46,6 +44,16 @@
     .pointColor(()=>'rgba(255,255,255,0.8)')
     .pointRadius(0.25)
     (globeEl);
+
+  // Optional features depending on Globe.gl version
+  if (typeof globe.showGraticules === 'function') {
+    globe.showGraticules(true);
+  }
+  if (typeof globe.graticuleColor === 'function') {
+    globe.graticuleColor('#ffffff18');
+  } else if (typeof globe.graticulesColor === 'function') {
+    globe.graticulesColor('#ffffff18');
+  }
 
   // Initial camera pose
   globe.controls().autoRotate = true;
@@ -81,7 +89,9 @@
   }
   if(layerGraticules){
     layerGraticules.addEventListener('change', ()=>{
-      globe.showGraticules(layerGraticules.checked);
+      if (typeof globe.showGraticules === 'function') {
+        globe.showGraticules(layerGraticules.checked);
+      }
     });
   }
 
