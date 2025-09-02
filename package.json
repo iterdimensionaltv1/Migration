@@ -9,11 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "globe.gl": "^2.29.0",
+    "globe.gl": "^2.34.0",
     "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.158.0"
+    "three": "^0.165.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
@@ -22,4 +22,3 @@
     "typescript": "^5.4.5"
   }
 }
-
