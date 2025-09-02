@@ -17,6 +17,11 @@
   const aboutModal = document.getElementById('aboutModal');
   const aboutClose = document.getElementById('aboutClose');
   const loadingEl = document.getElementById('loading');
+  // External quantitative dataset (optional)
+  const PACKET_SCALE_DEFAULT = 500000; // people per dot (tune later)
+  let PACKET_SCALE = PACKET_SCALE_DEFAULT;
+  let EXTERNAL_DATA = null; // { nodes: [], flows: [] }
+  let useExternal = false;
 
   // --- Globe setup ---
   const globe = Globe()
@@ -34,15 +39,15 @@
     .polygonStrokeColor(()=>'rgba(255,255,255,0.20)')
     .polygonsTransitionDuration(0)
     // Migration arcs and points
-    .arcStroke(0.9)
-    .arcAltitude(d => 0.06 + 0.01 * (d.magnitude || 1))
-    .arcDashLength(0.9)
-    .arcDashGap(0.7)
-    .arcDashAnimateTime(3500)
-    .arcLabel(d => `${d.name}\n${fmtEra(d.category)} • ${fmtRange(d.start,d.end)}\n${d.description || ''}`)
-    .pointAltitude(0.01)
-    .pointColor(()=>'rgba(255,255,255,0.8)')
-    .pointRadius(0.25)
+    .arcStroke(0.7)
+    .arcAltitude(d => 0.02 + 0.005 * (d.magnitude || 1))
+    .arcDashLength(0.03)
+    .arcDashGap(1)
+    .arcDashAnimateTime(2500)
+    .arcLabel(d => `${d.name || ''}\n${fmtRange(d.start,d.end)}`)
+    .pointAltitude(0.006)
+    .pointColor(()=> 'rgba(90,255,140,0.9)')
+    .pointRadius(0.22)
     (globeEl);
 
   // Optional features depending on Globe.gl version
@@ -166,16 +171,32 @@
   }
   const ALL_PARTICLE_ARCS = ALL_ARCS.flatMap(makeParticleCopies);
 
+  // Attempt to load external flows/nodes dataset if present under assets/
+  async function tryLoadExternalData(){
+    try{
+      const [nodesRes, flowsRes] = await Promise.all([
+        fetch('assets/nodes.json'),
+        fetch('assets/flows.json')
+      ]);
+      if(!nodesRes.ok || !flowsRes.ok) return;
+      const [nodes, flows] = await Promise.all([nodesRes.json(), flowsRes.json()]);
+      if(Array.isArray(nodes) && Array.isArray(flows)){
+        EXTERNAL_DATA = { nodes, flows };
+        useExternal = true;
+        try{
+          const cfgRes = await fetch('assets/config.json');
+          if(cfgRes.ok){ const cfg = await cfgRes.json(); if(cfg && cfg.packetScale) PACKET_SCALE = cfg.packetScale; }
+        }catch(_e){ /* ignore */ }
+      }
+    }catch(_e){ /* ignore; fallback to built-in */ }
+  }
+  tryLoadExternalData();
+
   // Colors per era + confidence → alpha
   function baseColorFor(d){
-    const c = {
-      "Paleolithic": [122,208,255],
-      "Holocene/Ancient": [255,193,90],
-      "EarlyModern/Modern": [255,110,199]
-    }[d.category] || [200,200,200];
-
-    const alpha = { high: 0.95, medium: 0.75, low: 0.50 }[d.confidence] || 0.7;
-    return `rgba(${c[0]},${c[1]},${c[2]},${alpha})`;
+    // Use a single green hue to represent people/population
+    const alpha = { high: 0.9, medium: 0.75, low: 0.55 }[d.confidence] || 0.8;
+    return `rgba(90,255,140,${alpha})`;
   }
   let highlightedRouteId = null;
   let selectedRouteId = null;
@@ -191,11 +212,7 @@
     .arcsData([])
     .arcColor(colorWithHighlight)
     .arcStroke(d => ((d.routeId === highlightedRouteId || d.routeId === selectedRouteId) ? 1.0 : 0.7))
-    // tiny moving dashes to appear as dots
-    .arcDashLength(0.03)
-    .arcDashGap(1)
-    .arcDashInitialGap(d => d.dashOffset)
-    .arcDashAnimateTime(2000);
+    .arcDashInitialGap(d => d.dashOffset);
 
   // Points at waypoints (origins only for clarity)
   // Remove origin markers to reduce visual clutter
@@ -228,6 +245,17 @@
     const tol = currentYear < -10000 ? 4000
               : currentYear < 1500    ? 500
               : 80;
+
+    // If an external quantitative dataset is present, render from it
+    if(useExternal && EXTERNAL_DATA){
+      const nodes = buildExternalNodesForYear(currentYear);
+      globe.pointRadius(n => Math.max(0.05, Math.min(1.2, Math.sqrt((n.value||0)) / 800)));
+      globe.pointsData(nodes);
+      const arcs = buildExternalParticlesForYear(currentYear);
+      globe.arcsData(arcs);
+      renderActiveListExternal(arcs);
+      return;
+    }
 
     const activeSegIds = new Set(
       ALL_ARCS
@@ -262,6 +290,100 @@
         globe.pointOfView({ lat: centroid[0], lng: centroid[1], altitude: 1.8 }, 1200);
         const mid = Math.round((r.start + r.end)/2);
         setYear(mid);
+        globe.arcsData(globe.arcsData());
+      });
+      activeList.appendChild(card);
+    });
+  }
+
+  function eraByYear(y){
+    if(y < -10000) return 'Paleolithic';
+    if(y < 1500) return 'Holocene/Ancient';
+    return 'EarlyModern/Modern';
+  }
+
+  function buildExternalParticlesForYear(y){
+    if(!EXTERNAL_DATA) return [];
+    const result = [];
+    const tol = y < -10000 ? 4000 : y < 1500 ? 500 : 80;
+    const flows = EXTERNAL_DATA.flows || [];
+    for(const f of flows){
+      const series = Array.isArray(f.series) ? f.series : [];
+      const s = series.find(b => y >= b.t0 - tol && y < b.t1 + tol);
+      if(!s || !s.count) continue;
+      const count = s.count;
+      const k = Math.max(1, Math.min(1000, Math.round(count / PACKET_SCALE)));
+      const path = Array.isArray(f.path) ? f.path : [];
+      if(path.length < 2) continue;
+      for(let i=0;i<path.length-1;i++){
+        const [lat1, lon1] = path[i];
+        const [lat2, lon2] = path[i+1];
+        for(let p=0;p<k;p++){
+          result.push({
+            id: `${f.id || (f.originId+"_"+f.destId)}_seg${i}_p${p}`,
+            routeId: f.id || `${f.originId}_${f.destId}`,
+            name: f.name,
+            originId: f.originId, destId: f.destId,
+            originName: f.originName, destName: f.destName,
+            category: eraByYear(y),
+            start: s.t0, end: s.t1,
+            magnitude: 1, confidence: f.confidence || 'medium',
+            count,
+            startLat: lat1, startLng: lon1,
+            endLat: lat2, endLng: lon2,
+            dashOffset: Math.random()
+          });
+        }
+      }
+    }
+    return result;
+  }
+
+  function buildExternalNodesForYear(y){
+    const nodes = (EXTERNAL_DATA && EXTERNAL_DATA.nodes) ? EXTERNAL_DATA.nodes : [];
+    const out = [];
+    for(const n of nodes){
+      const v = popAtYear(n.popSeries, y);
+      if(v && n.lat != null && n.lon != null){
+        out.push({ lat: n.lat, lng: n.lon, name: n.name || n.id, value: v });
+      }
+    }
+    return out;
+  }
+
+  function popAtYear(series, y){
+    if(!Array.isArray(series) || !series.length) return null;
+    // choose closest known value (simple; can interpolate later)
+    let best = null; let bestDiff = Infinity;
+    for(const p of series){
+      const diff = Math.abs((p.t||0) - y);
+      if(diff < bestDiff){ bestDiff = diff; best = p.pop; }
+    }
+    return best || null;
+  }
+
+  function renderActiveListExternal(arcs){
+    activeList.innerHTML = '';
+    const byFlow = new Map();
+    arcs.forEach(a => { if(!byFlow.has(a.routeId)) byFlow.set(a.routeId, a); });
+    [...byFlow.values()].slice(0,40).forEach(a => {
+      const colorClass = a.category === 'Paleolithic' ? 'chip-paleo' : (a.category === 'Holocene/Ancient' ? 'chip-ancient' : 'chip-modern');
+      const card = document.createElement('div');
+      card.className = 'card';
+      const label = a.name || `${a.originName || a.originId || '?'} → ${a.destName || a.destId || '?'}`;
+      card.innerHTML = `
+        <div>
+          <div class="title">${escapeHtml(label)}</div>
+          <div class="era"><span class="chip ${colorClass}"></span>${fmtEra(a.category)} • ${formatYear(currentYear)}</div>
+        </div>
+        <div class="meta">${a.count ? `${a.count.toLocaleString()} (packet ${PACKET_SCALE.toLocaleString()})` : ''}</div>
+        <div class="desc">External dataset flow; visualization is schematic.</div>
+      `;
+      card.addEventListener('mouseenter', ()=>{ highlightedRouteId = a.routeId; globe.arcsData(globe.arcsData()); });
+      card.addEventListener('mouseleave', ()=>{ highlightedRouteId = null; globe.arcsData(globe.arcsData()); });
+      card.addEventListener('click', ()=>{
+        const c = centroidOf(a.path || [[a.startLat,a.startLng],[a.endLat,a.endLng]]);
+        globe.pointOfView({ lat: c[0], lng: c[1], altitude: 1.8 }, 1200);
         globe.arcsData(globe.arcsData());
       });
       activeList.appendChild(card);

@@ -9,6 +9,7 @@
   --paleo:#7ad0ff;     /* ice blue */
   --ancient:#ffc15a;   /* warm amber */
   --modern:#ff6ec7;    /* magenta */
+  --people:#5aff8c;    /* green for population */
 }
 
 *{box-sizing:border-box}
@@ -86,6 +87,7 @@ html,body,#app{height:100%; margin:0; background:radial-gradient(1200px 700px at
 .chip-paleo{background:var(--paleo)}
 .chip-ancient{background:var(--ancient)}
 .chip-modern{background:var(--modern)}
+.chip-people{background:var(--people)}
 .legend-note{grid-column:1/-1; font-size:11px; color:var(--muted)}
 
 .sources{max-height:160px; overflow:auto; font-size:12px; display:flex; flex-direction:column; gap:6px}

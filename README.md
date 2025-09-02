@@ -102,6 +102,9 @@ Contributing Data
    - At least one reputable citation in `sources`
 3) Test locally, scrub for typos, and ensure the new route renders and filters properly.
 
+Optionally provide quantitative data
+- The app can also consume same‑origin external files under `assets/` for quantitative, time‑binned flows and node populations. See `docs/data-spec.md` for the JSON schemas (`nodes.json`, `flows.json`, and optional `config.json`). If present, these will drive the moving‑dots visualization instead of the built‑in `ROUTES`.
+
 
 Roadmap (Implementation Plan)
 Phase 1 — Core experience (done/partial)
