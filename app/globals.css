@@ -1,0 +1,42 @@
+:root{
+  --bg:#0b0f14;
+  --glass:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.10);
+  --text:#eaf2ff;
+  --muted:#a7b3c7;
+  --accent:#79c0ff;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%; margin:0; background:radial-gradient(1200px 700px at 50% 40%,#101621 0%,#0b0f14 60%, #06080b 100%); color:var(--text); font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
+
+.topbar{
+  position:fixed; left:16px; right:420px; top:16px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border:1px solid var(--border); border-radius:12px; backdrop-filter: blur(12px); background:var(--glass);
+  z-index:20;
+}
+.brand h1{font-size:16px; letter-spacing:.18em; margin:0; color:#fff; font-weight:700}
+.sub{font-size:12px; color:var(--muted); margin-top:2px}
+.controls{display:flex; align-items:center; gap:12px}
+.mode{height:32px; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:#fff; cursor:pointer; font-size:12px}
+.mode.active{background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)); border-color:rgba(255,255,255,.28)}
+.panel{
+  position:fixed; top:16px; right:16px; bottom:16px; width:400px;
+  display:flex; flex-direction:column; gap:12px;
+  padding:12px; border:1px solid var(--border); border-radius:14px; backdrop-filter: blur(14px); background:var(--glass); z-index:30;
+}
+.section{border:1px solid var(--border); border-radius:12px; padding:12px}
+.title{font-size:12px; letter-spacing:.12em; color:#b7c6df; text-transform:uppercase; margin-bottom:8px}
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chip{border:1px solid var(--border); background:transparent; color:#dbe7ff; border-radius:999px; padding:6px 10px; font-size:11px; cursor:pointer}
+.globe{position:absolute; inset:0}
+.hidden{display:none}
+.list{max-height:240px; overflow:auto; display:flex; flex-direction:column; gap:8px}
+.card{border:1px solid var(--border); border-radius:10px; padding:10px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));}
+
+@media (max-width:1100px){
+  .topbar{right:16px}
+  .panel{position:static; width:auto; margin:16px}
+}
+

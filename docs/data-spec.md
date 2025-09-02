@@ -41,6 +41,8 @@ File: flows.json
     ],
     "confidence": "high",     // optional; low/medium/high
     "sources": [               // optional list of citation keys
+      // Prefer ids from migrations.js SOURCES so app can link them
+      // Otherwise, cite in docs/data-sources.md until added
       "UNDESA_IMS2020", "IOM_WMR2024_Corridors"
     ]
   }
@@ -66,4 +68,3 @@ Size and performance
 
 Licensing
 - Ensure the data you provide is licensed for redistribution. Include citation keys that map to entries in `migrations.js` SOURCES or provide an additional sources file.
-

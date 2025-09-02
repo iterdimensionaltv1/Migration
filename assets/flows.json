@@ -2,8 +2,14 @@
   {"id":"oa_southern","name":"Out of Africa (southern route)",
    "originId":"HORN","destId":"INDIA",
    "path":[[10,45],[18,47],[20,75]],
-   "series":[{"t0":-85000,"t1":-55000,"count":1500000}],
+   "series":[{"t0":-85000,"t1":-55000,"count":300000}],
    "confidence":"medium","sources":["REVIEW_Bae2017_Science","PNAS_Henn2012_GreatExpansion"]},
+
+  {"id":"oa_levant","name":"Early excursions into the Levant",
+   "originId":"NEAF","destId":"LEVANT",
+   "path":[[26,31],[32.6,35]],
+   "series":[{"t0":-180000,"t1":-90000,"count":100000}],
+   "confidence":"medium","sources":["SCIENCE_2018_Hershkovitz_Misliya"]},
 
   {"id":"to_sahul","name":"Into Sahul (Australia/New Guinea)",
    "originId":"WALLACEA","destId":"SAHUL_NA",
@@ -26,19 +32,19 @@
   {"id":"siberia","name":"Across Siberia",
    "originId":"CHINA","destId":"SIBERIA",
    "path":[[46,103],[65,110]],
-   "series":[{"t0":-35000,"t1":-25000,"count":600000}],
+   "series":[{"t0":-35000,"t1":-25000,"count":200000}],
    "confidence":"medium","sources":["REVIEW_Bae2017_Science"]},
 
   {"id":"beringia","name":"Beringia occupation",
    "originId":"SIBERIA","destId":"ALASKA",
    "path":[[66,170],[64,-165]],
-   "series":[{"t0":-25000,"t1":-16000,"count":500000}],
+   "series":[{"t0":-25000,"t1":-16000,"count":150000}],
    "confidence":"medium","sources":["REVIEW_Bae2017_Science"]},
 
   {"id":"americas_coastal","name":"Into the Americas (coastal)",
    "originId":"ALASKA","destId":"ANDES",
    "path":[[64,-165],[49,-123],[19,-99],[-13,-72]],
-   "series":[{"t0":-16000,"t1":-13000,"count":1500000}],
+   "series":[{"t0":-16000,"t1":-13000,"count":300000}],
    "confidence":"medium","sources":["SCIENCE_2023_WhiteSands","PNAS_Dillehay2015_MonteVerde"]},
 
   {"id":"neolithic_europe","name":"Neolithic farmers → Europe",
@@ -66,8 +72,8 @@
    "confidence":"high","sources":["PNAS_Grollemund2015_Bantu"]},
 
   {"id":"austronesian_taiwan_phil","name":"Austronesian Taiwan → Philippines",
-   "originId":"TAIWAN","destId":"SEASIA",
-   "path":[[24,121],[15,121]],
+   "originId":"TAIWAN","destId":"PHL",
+   "path":[[24,121],[14.6,121]],
    "series":[{"t0":-3000,"t1":-1500,"count":1000000}],
    "confidence":"high","sources":["REVIEW_Bae2017_Science"]},
 
@@ -78,15 +84,15 @@
    "confidence":"high","sources":["PNAS_Pierron2014_Madagascar","PNAS_Pierron2017_Madagascar"]},
 
   {"id":"yamnaya_europe","name":"Steppe (Yamnaya) → Europe",
-   "originId":"SIBERIA","destId":"WEU",
+   "originId":"PONTIC","destId":"WEU",
    "path":[[48,45],[52,15]],
-   "series":[{"t0":-3300,"t1":-2500,"count":2000000}],
+   "series":[{"t0":-3300,"t1":-2500,"count":1500000}],
    "confidence":"high","sources":["NATURE_Haak2015_Yamnaya"]},
 
   {"id":"steppe_sasia","name":"Steppe ancestry → South Asia",
-   "originId":"SIBERIA","destId":"INDIA",
+   "originId":"PONTIC","destId":"INDIA",
    "path":[[50,70],[28,75]],
-   "series":[{"t0":-1500,"t1":-1000,"count":2000000}],
+   "series":[{"t0":-1500,"t1":-1000,"count":1200000}],
    "confidence":"high","sources":["SCIENCE_Narasimhan2019_SouthAsia"]},
 
   {"id":"slave_brazil","name":"Trans‑Atlantic slave trade → Brazil",
@@ -102,7 +108,7 @@
   {"id":"slave_us","name":"Trans‑Atlantic slave trade → US Gulf",
    "originId":"CAM","destId":"US_GULF",
    "path":[[6,-3],[29,-90]],
-   "series":[{"t0":1501,"t1":1867,"count":3500000}],
+   "series":[{"t0":1501,"t1":1867,"count":500000}],
    "confidence":"high","sources":["SlaveVoyages"]},
 
   {"id":"euro_settlers_usa","name":"European settlers → USA",
@@ -113,12 +119,12 @@
   {"id":"euro_settlers_can","name":"European settlers → Canada",
    "originId":"UK","destId":"CAN_MTL",
    "path":[[52,-1.5],[45,-73]],
-   "series":[{"t0":1700,"t1":1900,"count":8000000}],
+   "series":[{"t0":1700,"t1":1900,"count":5000000}],
    "confidence":"high"},
   {"id":"euro_settlers_aus","name":"European settlers → Australia",
    "originId":"UK","destId":"SAHUL_NA",
    "path":[[52,-1.5],[-33.9,151.2]],
-   "series":[{"t0":1788,"t1":1900,"count":3000000}],
+   "series":[{"t0":1788,"t1":1900,"count":2000000}],
    "confidence":"high"},
   {"id":"euro_settlers_nz","name":"European settlers → NZ",
    "originId":"UK","destId":"NZ",
@@ -134,12 +140,12 @@
   {"id":"us_great_migration2","name":"U.S. Great Migration (to Detroit)",
    "originId":"US_SOUTH","destId":"DETROIT",
    "path":[[33,-90],[42.3,-83]],
-   "series":[{"t0":1910,"t1":1970,"count":1500000}],
+   "series":[{"t0":1910,"t1":1970,"count":1200000}],
    "confidence":"high"},
   {"id":"us_great_migration3","name":"U.S. Great Migration (to NYC)",
    "originId":"US_SOUTH","destId":"NYC",
    "path":[[33,-90],[40.7,-74]],
-   "series":[{"t0":1910,"t1":1970,"count":2000000}],
+   "series":[{"t0":1910,"t1":1970,"count":1800000}],
    "confidence":"high"},
   {"id":"us_great_migration4","name":"U.S. Great Migration (to LA)",
    "originId":"US_SOUTH","destId":"LA",
@@ -147,10 +153,15 @@
    "series":[{"t0":1910,"t1":1970,"count":1000000}],
    "confidence":"high"},
 
-  {"id":"partition_india_pak","name":"Partition India/Pakistan",
+  {"id":"partition_india_pak_e","name":"Partition India→Pakistan",
+   "originId":"DELHI","destId":"LAHORE",
+   "path":[[28.6,77.2],[31.5,74.3]],
+   "series":[{"t0":1947,"t1":1950,"count":7000000}],
+   "confidence":"high","sources":["UNHCR_2000_Partition14M"]},
+  {"id":"partition_pak_ind","name":"Partition Pakistan→India",
    "originId":"LAHORE","destId":"DELHI",
    "path":[[31.5,74.3],[28.6,77.2]],
-   "series":[{"t0":1947,"t1":1950,"count":14000000}],
+   "series":[{"t0":1947,"t1":1950,"count":7000000}],
    "confidence":"high","sources":["UNHCR_2000_Partition14M"]},
 
   {"id":"mex_usa","name":"Mexico → USA",
@@ -172,5 +183,101 @@
    "originId":"DAMASCUS","destId":"ANTALYA",
    "path":[[33.5,36.3],[36.8,30.7]],
    "series":[{"t0":2011,"t1":2025,"count":3700000}],
+   "confidence":"high"}
+
+  ,{"id":"ep_hawaii","name":"East Polynesia pulse → Hawai‘i",
+   "originId":"TAHITI","destId":"HAWAII",
+   "path":[[-17.6,-149.4],[20.7,-157.8]],
+   "series":[{"t0":1190,"t1":1290,"count":50000}],
+   "confidence":"high","sources":["PNAS_Wilmshurst2011_EastPolynesia"]}
+  ,{"id":"ep_rapanui","name":"East Polynesia pulse → Rapa Nui",
+   "originId":"TAHITI","destId":"RAPANUI",
+   "path":[[-17.6,-149.4],[-27.1,-109.4]],
+   "series":[{"t0":1190,"t1":1290,"count":5000}],
+   "confidence":"high","sources":["PNAS_Wilmshurst2011_EastPolynesia"]}
+  ,{"id":"ep_nz","name":"East Polynesia pulse → Aotearoa",
+   "originId":"TAHITI","destId":"NZ",
+   "path":[[-17.6,-149.4],[-41.3,174.7]],
+   "series":[{"t0":1250,"t1":1350,"count":80000}],
+   "confidence":"high","sources":["PNAS_Wilmshurst2011_EastPolynesia"]}
+
+  ,{"id":"indentured_carib","name":"Indian indentured → Caribbean",
+   "originId":"INDIA","destId":"CARIB",
+   "path":[[19.1,72.9],[18.5,-72]],
+   "series":[{"t0":1835,"t1":1917,"count":500000}],
+   "confidence":"high"}
+  ,{"id":"indentured_saf","name":"Indian indentured → South Africa",
+   "originId":"INDIA","destId":"SAF",
+   "path":[[19.1,72.9],[-29.9,31.0]],
+   "series":[{"t0":1860,"t1":1911,"count":150000}],
+   "confidence":"high"}
+  ,{"id":"indentured_mauritius","name":"Indian indentured → Mauritius",
+   "originId":"INDIA","destId":"MAURITIUS",
+   "path":[[19.1,72.9],[-20.2,57.5]],
+   "series":[{"t0":1834,"t1":1910,"count":450000}],
+   "confidence":"high"}
+  ,{"id":"indentured_fiji","name":"Indian indentured → Fiji",
+   "originId":"INDIA","destId":"FIJI",
+   "path":[[19.1,72.9],[-18.1,178.4]],
+   "series":[{"t0":1879,"t1":1916,"count":60000}],
+   "confidence":"high"}
+
+  ,{"id":"china_singapore","name":"Chinese diaspora → Singapore",
+   "originId":"CHINA","destId":"SINGAPORE",
+   "path":[[22.3,114.2],[1.35,103.82]],
+   "series":[{"t0":1850,"t1":1950,"count":1000000}],
+   "confidence":"medium"}
+
+  ,{"id":"turk_germany","name":"Türkiye → Germany (Gastarbeiter)",
+   "originId":"ANATOLIA","destId":"GERMANY",
+   "path":[[39,34],[52.5,13.4]],
+   "series":[{"t0":1961,"t1":2018,"count":3000000}],
+   "confidence":"high"}
+  ,{"id":"morocco_france","name":"Morocco → France",
+   "originId":"MOROCCO","destId":"FRANCE",
+   "path":[[31.7,-7.1],[48.86,2.35]],
+   "series":[{"t0":1960,"t1":2025,"count":2000000}],
+   "confidence":"high"}
+  ,{"id":"morocco_spain","name":"Morocco → Spain",
+   "originId":"MOROCCO","destId":"SPAIN",
+   "path":[[31.7,-7.1],[40.42,-3.70]],
+   "series":[{"t0":1990,"t1":2025,"count":1000000}],
+   "confidence":"medium"}
+  ,{"id":"syria_germany","name":"Syria → Germany",
+   "originId":"DAMASCUS","destId":"GERMANY",
+   "path":[[33.5,36.3],[52.5,13.4]],
+   "series":[{"t0":2013,"t1":2025,"count":1000000}],
+   "confidence":"high"}
+  ,{"id":"ukraine_poland","name":"Ukraine → Poland (refugees)",
+   "originId":"UKRAINE","destId":"POLAND",
+   "path":[[50.45,30.52],[52.23,21.01]],
+   "series":[{"t0":2022,"t1":2025,"count":3000000}],
+   "confidence":"high"}
+  ,{"id":"ukraine_germany","name":"Ukraine → Germany (refugees)",
+   "originId":"UKRAINE","destId":"GERMANY",
+   "path":[[50.45,30.52],[52.5,13.4]],
+   "series":[{"t0":2022,"t1":2025,"count":1000000}],
+   "confidence":"high"}
+  ,{"id":"china_usa","name":"China → USA",
+   "originId":"CHINA","destId":"SF_BAY",
+   "path":[[31.2,121.5],[37.77,-122.42]],
+   "series":[{"t0":1990,"t1":2025,"count":2500000}],
+   "confidence":"high"}
+
+  ,{"id":"italy_arg","name":"Italy → Argentina",
+   "originId":"ITALY","destId":"ARGENTINA",
+   "path":[[41.90,12.50],[-34.60,-58.38]],
+   "series":[{"t0":1880,"t1":1930,"count":4000000}],
+   "confidence":"high"}
+  ,{"id":"spain_arg","name":"Spain → Argentina",
+   "originId":"SPAIN","destId":"ARGENTINA",
+   "path":[[40.42,-3.70],[-34.60,-58.38]],
+   "series":[{"t0":1880,"t1":1930,"count":2000000}],
+   "confidence":"high"}
+
+  ,{"id":"phil_gulf","name":"Philippines → Gulf (UAE proxy)",
+   "originId":"PHL","destId":"DUBAI",
+   "path":[[14.60,120.98],[25.2,55.3]],
+   "series":[{"t0":1990,"t1":2025,"count":2000000}],
    "confidence":"high"}
 ]

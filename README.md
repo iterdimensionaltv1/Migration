@@ -1,21 +1,18 @@
-# Human Migrations: 500,000 BCE → 2025
+# Human Migration Simulator (Next.js)
 
-An interactive web app that visualizes the migration of Homo sapiens across the globe from 500,000 BCE to 2025. Explore a beautiful, animated 3D globe with a time slider, play/pause controls, and layered views from Paleolithic dispersals to modern migration corridors. Every route includes sources and confidence notes, and the full dataset can be downloaded as JSON.
+An evidence‑driven globe showing Homo sapiens movements from 500,000 BCE → 2025 CE. The codebase has been fully refactored to a modern Next.js (App Router, TypeScript) app with Globe.gl, a symlog timeline, modes (Explore/Story/What‑If/Analyst), search/bookmarking, and CSV/GeoJSON exports. See docs/northstar.md for the product design.
 
 
 Quick Start
-- Requirements: a modern desktop or mobile browser. Run over a local web server (recommended) to avoid cross‑origin issues with textures.
-- Start a static server from the project root:
-  - Python: `python -m http.server 5500` then open `http://localhost:5500`
-  - Node: `npx serve` (or your preferred static server)
-  - VS Code: “Live Server” extension
+- Dev: `npm install && npm run dev` → http://localhost:3000
+- Build: `npm run build`; Start: `npm start`.
 
-Open `index.html` and interact:
-- Space: play/pause the timeline
-- Left/Right arrows: step time backward/forward (step size varies by era)
-- Toggle layers: Paleolithic, Holocene/Ancient, Early‑Modern/Modern
-- Adjust speed: Cinematic → Insane
-- “Download data (JSON)”: exports all routes and sources
+Use the UI
+- Modes: Explore (default), Story (stub chapters), What‑If (environment controls), Analyst (exports).
+- Layers: Paleolithic, Holocene/Ancient, Early‑Modern/Modern.
+- Timeline: symlog slider with epoch chips (MIS 5, LGM, Early Holocene, Neolithic, Classical, 1500–1900, 1900–2025).
+- Search + Bookmark: keyword filter and permalink via URL.
+- Exports: CSV/GeoJSON for the current filtered/active routes.
 
 
 What This Is
@@ -26,55 +23,24 @@ What This Is
 
 
 How It Works
-- Globe and rendering: `Globe.gl` (bundles Three.js) via CDN; arcs for routes; points indicate common origins.
-- Timeline: a range slider and play loop advance the current year; step size adapts by era (coarser in deep time, finer in recent centuries).
-- Layers: filter by era to reduce visual density or focus on a period.
-- Data export: click “Download data (JSON)” to save the exact dataset currently embedded in the app.
+- Frontend: Next.js App Router + React 18 + TypeScript.
+- Globe: Globe.gl with GPU‑instanced arc particles; uncertainty encoded via alpha and jitter.
+- Timeline: symlog slider mapping `0..1000 → −500k..2025`, epoch chips; adaptive step.
+- Data: loads `public/data/dataset.json`; fallbacks only for local dev.
+- Environment: LGM ice mask overlay (mock) via `public/data/env/ice_lgm.geojson`; sea‑level slider modulates overlay emphasis.
 
 
 Data Model
-Data lives in `migrations.js` as two globals: `SOURCES` and `ROUTES`.
+Data lives in `public/data/dataset.json`:
 
-- `SOURCES`: a dictionary of citations keyed by a stable id.
-  - `label` (string): human‑readable citation text
-  - `url` (string): link to the source
+- `sources`: dictionary of citations keyed by id { label, url }.
+- `routes`: array of routes with fields:
+  - `id`, `name`, `category` ("Paleolithic"|"Holocene/Ancient"|"EarlyModern/Modern"),
+  - `start`, `end` (years; BCE negative),
+  - `magnitude` (1–5), `confidence` ("low"|"medium"|"high"),
+  - `waypoints` [[lat, lon], ...], `sources` [keys], `description`.
 
-- `ROUTES`: an array of route objects:
-  - `id` (string): stable identifier
-  - `name` (string): route label
-  - `category` (string): one of "Paleolithic", "Holocene/Ancient", "EarlyModern/Modern"
-  - `start` (number): start year (BCE negative; CE positive)
-  - `end` (number): end year
-  - `magnitude` (1–5): relative flow weight for visual emphasis (not a headcount)
-  - `confidence` ("low"|"medium"|"high"): dating/interpretation confidence
-  - `waypoints` (array of `[lat, lon]`): sequential points that form the route’s arc segments
-  - `sources` (array of `SOURCES` keys): supporting citations
-  - `description` (string): short note on interpretation, context, or scope
-
-Example (abridged):
-```
-const SOURCES = {
-  NATURE_Hublin2017_JebelIrhoud: {
-    label: "Hublin et al. 2017 (Nature): Jebel Irhoud ~315±34 ka",
-    url: "https://www.nature.com/articles/nature22336"
-  }
-};
-
-const ROUTES = [
-  {
-    id: "southern_oa_85_55ka",
-    name: "Major Out‑of‑Africa via Arabia (southern route)",
-    category: "Paleolithic",
-    start: -85000,
-    end: -55000,
-    magnitude: 2,
-    confidence: "medium",
-    waypoints: [[10,45],[18,47],[20,75]],
-    sources: ["NATURE_Hublin2017_JebelIrhoud"],
-    description: "Main sustained dispersal of H. sapiens into Arabia and South Asia."
-  }
-];
-```
+See the included `public/data/dataset.json` for a complete example.
 
 
 Methodology & Caveats
@@ -85,12 +51,11 @@ Methodology & Caveats
 
 
 Architecture
-- `index.html`: layout, panels, and Globe.gl script
-- `app.js`: globe setup, animation loop, filtering, UI bindings
-- `migrations.js`: data schema (`SOURCES`, `ROUTES`) and curated routes
-- `styles.css`: glass‑style UI, legend, responsive tweaks
-- External assets: Earth textures from unpkg via Globe.gl examples
- - Borders: prefer same-origin `assets/ne_110m_admin_0_countries.geojson` to avoid CORS; see `docs/assets.md`
+- `app/*`: App Router pages, layout, route handlers (`/api/borders`).
+- `components/*`: Globe view, timeline, mode bar.
+- `lib/*`: symlog mapping, data client, mocked data (dev only).
+- `public/data/*`: dataset and environment overlays.
+- `src/types/sim.ts`: data model interfaces.
 
 
 Contributing Data
@@ -108,10 +73,8 @@ Optionally provide quantitative data
 
 Roadmap (Implementation Plan)
 Phase 1 — Core experience (done/partial)
-- Interactive 3D globe, timeline, and playback controls
-- Era layers; visual encoding for magnitude and confidence
-- Initial dataset spanning key dispersals and corridors with sources
-- Sources panel and JSON export
+- Next.js app with globe, symlog timeline + chips, modes scaffold
+- Dataset load + CSV/GeoJSON export; search; bookmarking
 
 Phase 2 — Data enrichment and coverage
 - Deepen Paleolithic coverage (Africa‑wide dynamics, multiple Levant windows, Asia detail)
@@ -138,6 +101,10 @@ Phase 5 — Quality, accessibility, and i18n
 Phase 6 — Packaging and deployment
 - Pin CDN versions; offline asset option
 - CI deploy to GitHub Pages/Netlify; basic telemetry (optional)
+
+Deployment
+- Deploy the repository root as a Next.js app (Vercel recommended). No legacy static app remains.
+- Environment overlay lives at `public/data/env/ice_lgm.geojson`.
 
 If you want, open issues for specific routes you’d like to see, share sources, or propose improvements to the schema.
 
@@ -166,3 +133,7 @@ Key timeline anchors
 - 10 ka: agriculture & settlements
 - 1500–1900 CE: colonization to industrialization/globalization
 - 2025 CE: digital age, refugee crises, climate migration
+- Data & Sources
+- External data schema: see `docs/data-spec.md` for `assets/nodes.json`, `assets/flows.json`, and `assets/config.json`.
+- Source mapping and methodology: see `docs/data-sources.md` for references (paleoanthropology, Holocene dispersals, slave trade, modern corridors, refugees), assumptions, and how totals were chosen.
+- Built-in citations: `migrations.js` contains `SOURCES` used by both the app and the dataset (when ids match). Additions welcome via PR.

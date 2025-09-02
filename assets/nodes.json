@@ -29,6 +29,8 @@
    "popSeries":[{"t":-40000,"pop":200000},{"t":1500,"pop":50000000},{"t":1900,"pop":200000000},{"t":2020,"pop":400000000}]},
   {"id":"SIBERIA","name":"Siberia","lat":65,"lon":110,
    "popSeries":[{"t":-30000,"pop":100000},{"t":2020,"pop":35000000}]},
+  {"id":"PONTIC","name":"Pontic‑Caspian Steppe","lat":48,"lon":45,
+   "popSeries":[{"t":-3300,"pop":500000},{"t":0,"pop":2000000}]},
   {"id":"BERINGIAW","name":"Beringia (W)","lat":66,"lon":170,
    "popSeries":[{"t":-20000,"pop":50000}]},
   {"id":"ALASKA","name":"Alaska","lat":64,"lon":-165,
@@ -94,5 +96,30 @@
   {"id":"SF_BAY","name":"San Francisco Bay Area","lat":37.77,"lon":-122.42,
    "popSeries":[{"t":1900,"pop":400000},{"t":2020,"pop":7800000}]},
   {"id":"LAHORE","name":"Lahore","lat":31.5,"lon":74.3,
-   "popSeries":[{"t":1900,"pop":200000},{"t":2020,"pop":11000000}]}
+   "popSeries":[{"t":1900,"pop":200000},{"t":2020,"pop":11000000}]},
+  {"id":"GERMANY","name":"Germany (Berlin)","lat":52.5,"lon":13.4,
+   "popSeries":[{"t":1900,"pop":56000000},{"t":2020,"pop":83000000}]},
+  {"id":"FRANCE","name":"France (Paris)","lat":48.86,"lon":2.35,
+   "popSeries":[{"t":1900,"pop":41000000},{"t":2020,"pop":67000000}]},
+  {"id":"SPAIN","name":"Spain (Madrid)","lat":40.42,"lon":-3.70,
+   "popSeries":[{"t":1900,"pop":19000000},{"t":2020,"pop":47000000}]},
+  {"id":"MOROCCO","name":"Morocco","lat":31.7,"lon":-7.1,
+   "popSeries":[{"t":1900,"pop":4500000},{"t":2020,"pop":37000000}]},
+  {"id":"SINGAPORE","name":"Singapore","lat":1.35,"lon":103.82,
+   "popSeries":[{"t":1850,"pop":60000},{"t":2020,"pop":5700000}]},
+  {"id":"MAURITIUS","name":"Mauritius","lat":-20.2,"lon":57.5,
+   "popSeries":[{"t":1830,"pop":100000},{"t":2020,"pop":1300000}]},
+  {"id":"FIJI","name":"Fiji (Suva)","lat":-18.1,"lon":178.4,
+   "popSeries":[{"t":1870,"pop":120000},{"t":2020,"pop":900000}]},
+  {"id":"UKRAINE","name":"Ukraine (Kyiv)","lat":50.45,"lon":30.52,
+   "popSeries":[{"t":1900,"pop":25000000},{"t":2020,"pop":41000000}]},
+  {"id":"POLAND","name":"Poland (Warsaw)","lat":52.23,"lon":21.01,
+   "popSeries":[{"t":1900,"pop":25000000},{"t":2020,"pop":38000000}]}
+
+  ,{"id":"ITALY","name":"Italy (Rome)","lat":41.90,"lon":12.50,
+    "popSeries":[{"t":1900,"pop":33000000},{"t":2020,"pop":60000000}]}
+  ,{"id":"ARGENTINA","name":"Argentina (Buenos Aires)","lat":-34.60,"lon":-58.38,
+    "popSeries":[{"t":1900,"pop":4300000},{"t":2020,"pop":45000000}]}
+  ,{"id":"PHL","name":"Philippines (Manila)","lat":14.60,"lon":120.98,
+    "popSeries":[{"t":1900,"pop":7700000},{"t":2020,"pop":109000000}]}
 ]

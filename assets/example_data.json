@@ -1,0 +1,41 @@
+{
+  "sites": [
+    {
+      "id": "irhoud",
+      "name": "Jebel Irhoud",
+      "lat": 31.95,
+      "lon": -8.0,
+      "startBP": 349000,
+      "endBP": 281000,
+      "culture": "MSA",
+      "evidenceTypes": ["archaeology"],
+      "references": [{"id":"hublin2017","title":"Jebel Irhoud and the pan-African origin of Homo sapiens","year":2017}],
+      "confidence": 3
+    },
+    {
+      "id": "madjedbebe",
+      "name": "Madjedbebe",
+      "lat": -12.56,
+      "lon": 132.95,
+      "startBP": 70000,
+      "endBP": 50000,
+      "evidenceTypes": ["archaeology"],
+      "references": [{"id":"clarkson2017","title":"Human occupation of northern Australia by 65,000 years ago","year":2017}],
+      "confidence": 3
+    }
+  ],
+  "edges": [
+    {
+      "id": "lev_sinai_iup",
+      "fromSite": "north_africa",
+      "toSite": "levant",
+      "earliestBP": 70000,
+      "latestBP": 50000,
+      "routeGeometry": {"type": "LineString", "coordinates": [[20,25],[35,31]]},
+      "drivers": ["climate","technology"],
+      "evidence": [{"id":"abbas2023"}],
+      "confidence": 2
+    }
+  ]
+}
+
