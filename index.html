@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Human Migrations: 500,000 BCE → 2025</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Globe.gl (bundles Three.js) -->
+  <script src="https://unpkg.com/globe.gl"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="topbar" class="glass">
+      <div class="brand">
+        <h1>HUMAN MIGRATIONS</h1>
+        <div class="sub">An interactive, source‑based timeline • 500,000 BCE → 2025</div>
+      </div>
+
+      <div class="controls">
+        <button id="playBtn" title="Play/Pause (space)">▶</button>
+        <button id="resetBtn" title="Reset view">⟲</button>
+        <label class="speed">
+          Speed
+          <select id="speedSelect">
+            <option value="500">Cinematic</option>
+            <option value="200">Slow</option>
+            <option value="80" selected>Normal</option>
+            <option value="30">Fast</option>
+            <option value="10">Insane</option>
+          </select>
+        </label>
+
+        <div class="year">
+          <span id="yearLabel">Year: –500,000</span>
+        </div>
+
+        <button id="aboutBtn" class="secondary small" title="About this project">About</button>
+      </div>
+    </div>
+
+    <div id="globeContainer"></div>
+
+    <div id="rightPanel" class="glass">
+      <div class="panel-section">
+        <div class="panel-title">Layers</div>
+        <label class="toggle">
+          <input type="checkbox" id="layerPaleo" checked />
+          <span>Paleolithic (pre‑10,000 BCE)</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="layerAncient" checked />
+          <span>Holocene & Ancient/Medieval (10,000 BCE → 1500 CE)</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="layerModern" checked />
+          <span>Early‑Modern & Modern (1500 CE → 2025)</span>
+        </label>
+        <div class="divider"></div>
+        <label class="toggle">
+          <input type="checkbox" id="layerBorders" checked />
+          <span>Country borders</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="layerGraticules" checked />
+          <span>Graticules</span>
+        </label>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Timeline</div>
+        <input id="timeSlider" type="range" min="-500000" max="2025" step="25" value="-500000" />
+        <div class="ticks">
+          <span>–500k</span><span>–300k</span><span>–120k</span><span>–70k</span><span>–10k</span><span>0</span><span>1500</span><span>1900</span><span>2025</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Active migrations at this date</div>
+        <div id="activeList" class="list"></div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Legend</div>
+        <div class="legend">
+          <div><span class="chip chip-paleo"></span> Paleolithic</div>
+          <div><span class="chip chip-ancient"></span> Holocene/Ancient</div>
+          <div><span class="chip chip-modern"></span> Early‑Modern/Modern</div>
+          <div class="legend-note">Color encodes era; thickness encodes relative magnitude. Line transparency reflects dating confidence.</div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Data & Sources</div>
+        <div id="sourceList" class="sources"></div>
+        <button id="downloadDataBtn" class="secondary">Download data (JSON)</button>
+      </div>
+
+      <div class="footer">
+        Built with Globe.gl • No API keys required • Designed for desktop & touch
+      </div>
+    </div>
+  </div>
+
+  <script src="migrations.js"></script>
+  <script src="app.js"></script>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <div id="aboutTitle" class="modal-title">About • Human Migrations</div>
+        <button id="aboutClose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>This interactive globe animates human migrations from 500,000 BCE to 2025. Lines are schematic, color encodes era, thickness encodes relative magnitude, and transparency reflects confidence. Click routes in the panel to fly the camera. Data and sources are listed within the app and can be downloaded as JSON.</p>
+        <p>Accuracy notes: borders serve as a spatial reference only; deep‑time routes are uncertain and generalized. Please consult the cited literature for detail and debates.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div>Loading globe…</div>
+  </div>
+</body>
+</html>
