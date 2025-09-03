@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    typedRoutes: true
+    // Disable typedRoutes to allow query-string router.replace in App Router
+    typedRoutes: false
   },
   webpack: (config) => {
     // Work around optional WebGPU/TSL imports in three-globe / three
