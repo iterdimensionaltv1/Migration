@@ -152,7 +152,8 @@ export default function Page(){
   function downloadCsv(list: Route[]){
     const rows = [['id','name','category','start','end','confidence']];
     list.forEach(r => rows.push([r.id, r.name, r.category, String(r.start), String(r.end), (r as any).confidence]));
-    const csv = rows.map(r => r.map(x => String(x).replaceAll('"','""')).map(x=>`"${x}"`).join(',')).join('\n');
+    const escape = (s: string) => s.replace(/"/g, '""');
+    const csv = rows.map(r => r.map(x => escape(String(x))).map(x=>`"${x}"`).join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download='routes_filtered.csv'; a.click(); URL.revokeObjectURL(url);
