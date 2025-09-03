@@ -1,6 +1,6 @@
-export default class FlyControls {
+export class FlyControls {
   constructor(..._args){}
   update(){}
   dispose(){}
 }
-
+export default { FlyControls };
