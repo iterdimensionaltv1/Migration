@@ -13,8 +13,9 @@ const nextConfig = {
       ...(config.resolve.alias || {}),
       // Force a single Three.js instance
       'three': path.resolve(process.cwd(), 'node_modules/three'),
-      'three/webgpu': false,
-      'three/tsl': false
+      // Stub optional modules referenced by globe.gl/three-globe toolchain
+      'three/webgpu$': path.resolve(process.cwd(), 'stubs/three-webgpu.js'),
+      'three/tsl$': path.resolve(process.cwd(), 'stubs/three-tsl.js')
     };
     return config;
   }
