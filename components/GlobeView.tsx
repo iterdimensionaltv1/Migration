@@ -35,8 +35,7 @@ export default function GlobeView({ year, arcs, filters, envPolygons, envAlpha, 
     let globe: any;
     let mounted = true;
     (async () => {
-      const mod = await import('globe.gl');
-      Globe = mod.default || mod;
+      Globe = await ensureGlobeCDN();
       if (!mounted || !ref.current) return;
       globe = Globe()
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -145,6 +144,22 @@ export default function GlobeView({ year, arcs, filters, envPolygons, envAlpha, 
 
 function formatYear(y: number){
   return y < 0 ? `${Math.abs(y).toLocaleString()} BCE` : `${y.toLocaleString()} CE`;
+}
+
+declare global {
+  interface Window { Globe?: any }
+}
+function ensureGlobeCDN(): Promise<any> {
+  if (typeof window === 'undefined') return Promise.resolve(null);
+  if (window.Globe) return Promise.resolve(window.Globe);
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/globe.gl@2.36.2';
+    script.async = true;
+    script.onload = () => resolve(window.Globe);
+    script.onerror = () => reject(new Error('Failed to load globe.gl'));
+    document.head.appendChild(script);
+  });
 }
 
 function toVec(lat:number, lon:number){
