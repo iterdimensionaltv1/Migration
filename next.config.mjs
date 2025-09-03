@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -9,6 +11,8 @@ const nextConfig = {
     // Work around optional WebGPU/TSL imports in three-globe / three
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
+      // Force a single Three.js instance
+      'three': path.resolve(process.cwd(), 'node_modules/three'),
       'three/webgpu': false,
       'three/tsl': false
     };
