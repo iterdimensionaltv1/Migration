@@ -45,7 +45,12 @@ export default function GlobeView({ year, arcs, filters, envPolygons, envAlpha, 
         .atmosphereColor('#88c7ff')
         .atmosphereAltitude(0.25)
         .polygonsData([])
-        .polygonCapColor((d:any)=> d && d.properties && d.properties.__kind === 'ice' ? `rgba(180,220,255,${envAlpha ?? 0.18})` : 'rgba(0,0,0,0)')
+        .polygonCapColor((d:any)=> {
+          const kind = d && d.properties && d.properties.__kind;
+          if (kind === 'ice') return `rgba(180,220,255,${envAlpha ?? 0.18})`;
+          if (kind === 'coast') return `rgba(0,200,180,${Math.max(0, (envAlpha ?? 0.18) * 0.7)})`;
+          return 'rgba(0,0,0,0)';
+        })
         .polygonSideColor(()=> 'rgba(0,0,0,0)')
         .polygonStrokeColor(()=> 'rgba(0,0,0,0)')
         .polygonsTransitionDuration(0)

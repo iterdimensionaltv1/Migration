@@ -1,15 +1,22 @@
 export type Break = { t: number; y: number };
 
+// Two-zone symlog mapping
+// Deep-Time (compressed): 470 Ma → 500 ka
+// Sapiens (expanded): 500 ka → 2025
 export const BREAKS: Break[] = [
-  { t:   0, y: -500_000 },
-  { t:  50, y: -300_000 },
-  { t: 120, y: -120_000 },
-  { t: 200, y:  -70_000 },
-  { t: 350, y:  -10_000 },
-  { t: 500, y:        0 },
-  { t: 750, y:     1500 },
-  { t: 900, y:     1900 },
-  { t: 1000, y:    2025 }
+  // Deep-Time (0..200)
+  { t:    0, y: -470_000_000 }, // 470 Ma
+  { t:  100, y: -300_000_000 },
+  { t:  140, y: -200_000_000 },
+  { t:  170, y: -100_000_000 },
+  { t:  190, y:  -10_000_000 },
+  { t:  200, y:     -500_000 },
+  // Sapiens (200..1000)
+  { t:  350, y:      -10_000 },
+  { t:  500, y:             0 },
+  { t:  750, y:          1500 },
+  { t:  900, y:          1900 },
+  { t: 1000, y:          2025 }
 ];
 
 export function sliderToYear(t: number, breaks: Break[] = BREAKS) {
@@ -39,4 +46,3 @@ export function yearToSlider(y: number, breaks: Break[] = BREAKS) {
 export function formatYear(y: number) {
   return y < 0 ? `${Math.abs(y).toLocaleString()} BCE` : `${y.toLocaleString()} CE`;
 }
-

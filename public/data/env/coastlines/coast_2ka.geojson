@@ -1,0 +1,7 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {"type":"Feature","properties":{"name":"Modern-ish (mock)"},"geometry":{"type":"Polygon","coordinates":[[[162,62],[154,60],[146,58],[140,56],[144,55],[154,56],[162,58],[164,60],[162,62]]]}}
+  ]
+}
+

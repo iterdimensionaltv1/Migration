@@ -1,0 +1,7 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {"type":"Feature","properties":{"name":"Bering Land Bridge (retreat mock)"},"geometry":{"type":"Polygon","coordinates":[[[170,68],[162,65],[150,63],[140,61],[130,59],[124,58],[124,56],[130,55],[140,55],[150,56],[160,57],[168,60],[175,62],[175,66],[170,68]]]}}
+  ]
+}
+

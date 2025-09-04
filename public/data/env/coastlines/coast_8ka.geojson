@@ -1,0 +1,7 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {"type":"Feature","properties":{"name":"Residual lowstand (mock)"},"geometry":{"type":"Polygon","coordinates":[[[166,66],[158,64],[150,62],[140,60],[132,58],[130,56],[140,54],[152,55],[162,56],[168,58],[170,60],[170,64],[166,66]]]}}
+  ]
+}
+

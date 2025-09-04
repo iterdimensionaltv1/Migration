@@ -1,0 +1,8 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {"type":"Feature","properties":{"name":"Bering Land Bridge (mock)"},"geometry":{"type":"Polygon","coordinates":[[[170,70],[160,66],[150,64],[140,62],[130,60],[120,58],[120,56],[130,56],[140,56],[150,56],[160,58],[170,60],[178,62],[178,66],[170,70]]]}} ,
+    {"type":"Feature","properties":{"name":"Sunda Shelf (mock)"},"geometry":{"type":"Polygon","coordinates":[[[110,5],[104,2],[105,-3],[110,-6],[114,-6],[118,-5],[120,-2],[120,2],[116,4],[110,5]]]}}
+  ]
+}
+

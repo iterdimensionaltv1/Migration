@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#0a0e13"/>
+  <text x="40" y="80" font-family="Inter, Arial" font-size="48" fill="#79c0ff">Silurian (~428 Ma)</text>
+  <text x="40" y="130" font-family="Inter, Arial" font-size="22" fill="#b7c6df">Placeholder paleomap</text>
+  <ellipse cx="700" cy="360" rx="220" ry="140" fill="#123a48"/>
+  <path d="M 540 360 C 640 300 760 300 860 360 C 760 420 640 420 540 360 Z" fill="#2a6b7b"/>
+</svg>
+

@@ -1,0 +1,7 @@
+[
+  { "label": "26ka", "timeBP": 26000, "seaLevel": -120, "url": "/data/env/coastlines/coast_26ka.geojson" },
+  { "label": "12ka", "timeBP": 12000, "seaLevel":  -60, "url": "/data/env/coastlines/coast_12ka.geojson" },
+  { "label": "8ka",  "timeBP":  8000, "seaLevel":  -30, "url": "/data/env/coastlines/coast_8ka.geojson"  },
+  { "label": "5ka",  "timeBP":  5000, "seaLevel":  -10, "url": "/data/env/coastlines/coast_5ka.geojson"  },
+  { "label": "2ka",  "timeBP":  2000, "seaLevel":    0, "url": "/data/env/coastlines/coast_2ka.geojson"  }
+]

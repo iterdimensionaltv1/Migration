@@ -19,10 +19,27 @@ export default function HomeClient(){
   const [layers, setLayers] = useState({ paleo: true, ancient: true, modern: true });
   const [q, setQ] = useState('');
   const [routes, setRoutes] = useState<Route[]>(ROUTES);
-  const [envFrame, setEnvFrame] = useState<'present'|'lgm'>('present');
+  const [envFrame, setEnvFrame] = useState<'auto'|'present'|'lgm'>('auto');
   const [envPolys, setEnvPolys] = useState<any[]|null>(null);
   const [seaDelta, setSeaDelta] = useState<number>(0);
+  type CoastFrame = { label:string; timeBP:number; seaLevel?: number; url:string };
+  const [coastIndex, setCoastIndex] = useState<CoastFrame[]|null>(null);
+  const [density, setDensity] = useState<number>(1); // dot density scale
   const [evidence, setEvidence] = useState({ archaeology: true, genetics: true, linguistics: true, modern: true, 'historic-forced': true });
+  const minYear = -470_000_000;
+  const maxYear = 2025;
+  const [showPrelude, setShowPrelude] = useState(false);
+  const [preludeIndex, setPreludeIndex] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [playSpeed, setPlaySpeed] = useState<'slow'|'normal'|'fast'>('slow');
+
+  const PRELUDE_FRAMES = [
+    { y: -470_000_000, title: 'Middle Ordovician (~470 Ma)', text: 'Earliest African animal trackway (arthropod) on subaerial surfaces; Africa within Gondwana; tidal flats.', img: '/images/paleomap/ordovician.svg' },
+    { y: -428_000_000, title: 'Late Silurian (~428 Ma)', text: 'First definitive land‑animal body fossils (myriapods); plants spread inland; early soils.', img: '/images/paleomap/silurian.svg' },
+    { y: -395_000_000, title: 'Early–Middle Devonian (~395 Ma)', text: 'Earliest tetrapod trackways (global); coastal marine flats and lagoons.', img: '/images/paleomap/devonian.svg' },
+    { y: -360_000_000, title: 'Late Devonian (~360 Ma)', text: 'Earliest African tetrapods (Waterloo Farm); near‑polar Gondwana.', img: '/images/paleomap/late-devonian.svg' },
+    { y: -320_000_000, title: 'Carboniferous (~320 Ma)', text: 'Earliest amniote trackways; fully terrestrial vertebrates.', img: '/images/paleomap/carboniferous.svg' }
+  ];
 
   const classifyLayer = useCallback((r: Route): string => {
     const id = r.id || '';
@@ -88,22 +105,85 @@ export default function HomeClient(){
       if (mounted && ds && Array.isArray(ds.routes)) {
         setRoutes(ds.routes as unknown as Route[]);
       }
+      // load coastline frame index (if present)
+      try{
+        const r = await fetch('/data/env/coastlines/index.json', { cache: 'force-cache' });
+        if (r.ok){ const frames = await r.json(); if (mounted) setCoastIndex(frames); }
+      }catch(_e){ /* ignore */ }
     })();
     return ()=>{ mounted = false; };
   }, []);
 
-  // Load environment polygons when frame is LGM
+  // Autoplay timeline with adjustable speed
+  useEffect(() => {
+    if (!autoPlay) return;
+    const ms = playSpeed === 'slow' ? 1200 : playSpeed === 'normal' ? 600 : 220;
+    const interval = setInterval(() => {
+      setYear(prev => {
+        const next = prev + step(prev);
+        if (next > maxYear) return minYear; // loop
+        return next;
+      });
+    }, ms);
+    return () => clearInterval(interval);
+  }, [autoPlay, playSpeed]);
+
+  function step(y:number){
+    if (y < -100_000_000) return 10_000_000;
+    if (y <  -10_000_000) return 5_000_000;
+    if (y <     -100_000) return   500_000;
+    if (y <   -10_000) return   1_000;
+    if (y <    1_500) return   100;
+    if (y <    1_900) return    10;
+    return 1;
+  }
+
+  // Load environment polygons by frame or auto by year (Sapiens zone focus)
   useEffect(() => {
     let aborted = false;
-    if (envFrame !== 'lgm') { setEnvPolys(null); return; }
-    (async ()=>{
+    async function load() {
       try{
-        const res = await fetch('/data/env/ice_lgm.geojson', { cache: 'force-cache' });
-        if(res.ok){ const gj = await res.json(); if(!aborted){ setEnvPolys(gj.features || []); } }
+        if (envFrame === 'present') { setEnvPolys(null); return; }
+        // Choose ice + coastlines
+        let iceUrl: string | null = null;
+        let coastUrl: string | null = null;
+        if (envFrame === 'lgm') {
+          iceUrl = '/data/env/ice_lgm.geojson';
+          coastUrl = '/data/env/coastlines/coast_26ka.geojson';
+        } else {
+          // auto by current year
+          const y = year;
+          if (y <= -18000) iceUrl = '/data/env/ice_lgm.geojson';
+          coastUrl = selectCoastFrameUrl(coastIndex, y, seaDelta) || '/data/env/coastlines/coast_2ka.geojson';
+        }
+        const feats: any[] = [];
+        if (iceUrl){
+          const r = await fetch(iceUrl, { cache: 'force-cache' });
+          if (r.ok){ const gj = await r.json(); (gj.features||[]).forEach((f:any)=> feats.push({ ...f, properties:{ ...(f.properties||{}), __kind:'ice' }})); }
+        }
+        if (coastUrl){
+          // Try PMTiles first (same basename with .pmtiles), then fall back to GeoJSON
+          const pmtilesUrl = coastUrl.replace(/\.geojson$/i, '.pmtiles');
+          try{
+            const { tryLoadPmtilesPolys } = await import('@/lib/pmtiles');
+            const pmFeats = await tryLoadPmtilesPolys(pmtilesUrl, 1);
+            if (pmFeats && pmFeats.length){
+              pmFeats.forEach(f=> feats.push({ ...f, properties:{ ...(f.properties||{}), __kind:'coast' }}));
+            } else {
+              const r = await fetch(coastUrl, { cache: 'force-cache' });
+              if (r.ok){ const gj = await r.json(); (gj.features||[]).forEach((f:any)=> feats.push({ ...f, properties:{ ...(f.properties||{}), __kind:'coast' }})); }
+            }
+          }catch(_e){
+            const r = await fetch(coastUrl, { cache: 'force-cache' });
+            if (r.ok){ const gj = await r.json(); (gj.features||[]).forEach((f:any)=> feats.push({ ...f, properties:{ ...(f.properties||{}), __kind:'coast' }})); }
+          }
+        }
+        if (!aborted) setEnvPolys(feats.length ? feats : null);
       }catch(_e){ if(!aborted) setEnvPolys(null); }
-    })();
+    }
+    load();
     return ()=>{ aborted = true; };
-  }, [envFrame]);
+  }, [envFrame, year, seaDelta, coastIndex]);
 
   // Build dynamic arcs from routes
   const particleArcs = useMemo(()=>{
@@ -127,7 +207,7 @@ export default function HomeClient(){
           vizLayer: layer
         } as any;
         const base = Math.max(1, Math.min(5, ((r as any).magnitude || 1)));
-        const n = base * 12;
+        const n = Math.max(1, Math.min(2000, Math.round(base * 12 * density)));
         for(let p=0;p<n;p++){
           const confN = (r as any).confidence === 'high' ? 3 : (r as any).confidence === 'medium' ? 2 : 1;
           const jitter = (4 - confN) / 4;
@@ -171,17 +251,54 @@ export default function HomeClient(){
     const a = document.createElement('a'); a.href=url; a.download='routes_filtered.geojson'; a.click(); URL.revokeObjectURL(url);
   }
 
+  // Choose coastline frame URL based on year and sea level delta (simple heuristic)
+  function selectCoastFrameUrl(index: CoastFrame[]|null, y:number, delta:number): string | null {
+    if (!index || !index.length) return null;
+    // Estimate target sea level (m; present=0). Negative delta lowers sea level.
+    const tBP = y < 0 ? Math.abs(y) : 0;
+    const baseline = estimateSeaLevelFromTime(index, tBP);
+    const targetSL = (baseline ?? 0) + delta;
+    // Pick frame minimizing (seaLevel - targetSL)^2 + small time penalty
+    let best = index[0];
+    let bestScore = Infinity;
+    for (const f of index){
+      const sl = f.seaLevel ?? 0;
+      const se = sl - targetSL;
+      const te = (f.timeBP - tBP) / 5000; // penalty scaled by 5 ka
+      const score = se*se + te*te*0.25;
+      if (score < bestScore){ best = f; bestScore = score; }
+    }
+    return best.url;
+  }
+
+  function estimateSeaLevelFromTime(index: CoastFrame[], tBP:number): number | null {
+    // Use nearest frame seaLevel
+    let best = index[0]; let bestDiff = Math.abs(best.timeBP - tBP);
+    for (const f of index){ const d = Math.abs(f.timeBP - tBP); if (d < bestDiff){ best=f; bestDiff=d; } }
+    return best.seaLevel ?? 0;
+  }
+
   return (
     <div>
       <div className="topbar">
         <div className="brand">
           <h1>HUMAN MIGRATIONS</h1>
-          <div className="sub">Evidence‑driven globe • 500,000 BCE → 2025</div>
+          <div className="sub">Evidence‑driven globe • 470 Ma → 2025 CE</div>
         </div>
         <div className="controls">
           <ModeBar mode={mode} setMode={setMode} />
           <div style={{color:'#dce6ff'}}>Year: {formatYear(year)}</div>
           <input type="search" placeholder="Search routes" value={q} onChange={e=>setQ(e.target.value)} style={{height:32,padding:'0 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent',color:'#fff'}}/>
+          <button className="mode" onClick={()=>{ setShowPrelude(true); setPreludeIndex(0); }}>Prelude</button>
+          <button className="mode" onClick={()=>setAutoPlay(p=>!p)}>{autoPlay? '❚❚' : '▶'}</button>
+          <label style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <span style={{fontSize:12,color:'#b7c6df'}}>Speed</span>
+            <select value={playSpeed} onChange={e=>setPlaySpeed(e.target.value as any)} style={{background:'transparent',color:'#fff',border:'1px solid var(--border)',borderRadius:8,padding:'6px 8px'}}>
+              <option value="slow">Slow</option>
+              <option value="normal">Normal</option>
+              <option value="fast">Fast</option>
+            </select>
+          </label>
         </div>
       </div>
 
@@ -196,6 +313,15 @@ export default function HomeClient(){
         </div>
 
         <Timeline year={year} setYear={setYear} />
+
+        <div className="section">
+          <div className="title">Display</div>
+          <label style={{display:'flex',gap:8,alignItems:'center'}}>
+            Dot density
+            <input type="range" min={0.5} max={2} step={0.25} value={density} onChange={e=>setDensity(parseFloat(e.target.value))} />
+            <span style={{fontSize:12,color:'var(--muted)'}}>{density.toFixed(2)}×</span>
+          </label>
+        </div>
 
         <div className="section">
           <div className="title">Evidence</div>
@@ -226,6 +352,7 @@ export default function HomeClient(){
           <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
             <label>Frame
               <select value={envFrame} onChange={e=>setEnvFrame(e.target.value as any)} style={{marginLeft:6,background:'transparent',color:'#fff',border:'1px solid var(--border)',borderRadius:8,padding:'6px 8px'}}>
+                <option value="auto">Auto (by year)</option>
                 <option value="present">Present</option>
                 <option value="lgm">LGM (~26 ka)</option>
               </select>
@@ -235,7 +362,7 @@ export default function HomeClient(){
               <span style={{fontSize:12,color:'var(--muted)'}}>{seaDelta} m</span>
             </label>
           </div>
-          <div style={{fontSize:11,color:'var(--muted)'}}>LGM ice mask shown as translucent caps (mock). Sea level slider currently affects overlay emphasis.</div>
+          <div style={{fontSize:11,color:'var(--muted)'}}>Coastlines switch by time (auto) and show as teal overlays; LGM adds ice (blue). Sea‑level slider currently affects overlay emphasis only.</div>
         </div>
 
         <div className="section">
@@ -275,7 +402,34 @@ export default function HomeClient(){
           </div>
         )}
       </div>
+
+      {showPrelude && (
+        <div style={{position:'fixed',inset:0,display:'flex',alignItems:'center',justifyContent:'center',zIndex:60,background:'rgba(0,0,0,.55)'}} onClick={()=>setShowPrelude(false)}>
+          <div className="card" style={{width:'min(720px,92vw)',padding:16, background:'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02))', border:'1px solid var(--border)'}} onClick={(e)=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+              <div style={{fontWeight:700}}>Deep‑Time Prelude</div>
+              <button className="mode" onClick={()=>setShowPrelude(false)}>Close</button>
+            </div>
+            <div style={{fontSize:13,color:'#b7c6df',marginBottom:8}}>A compressed prologue before human migration. Tap next to preview key moments, then “Begin Sapiens”.</div>
+            <div className="card" style={{padding:12}}>
+              <img src={PRELUDE_FRAMES[preludeIndex].img} alt="Paleomap" style={{width:'100%',height:'auto',borderRadius:8,marginBottom:8}} />
+              <div style={{fontWeight:700, marginBottom:6}}>{PRELUDE_FRAMES[preludeIndex].title}</div>
+              <div style={{fontSize:13, color:'#dbe7ff', marginBottom:6}}>{PRELUDE_FRAMES[preludeIndex].text}</div>
+              <div style={{fontSize:12, color:'#b7c6df'}}>Year: {formatYear(PRELUDE_FRAMES[preludeIndex].y)}</div>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',marginTop:12}}>
+              <button className="mode" onClick={()=>setPreludeIndex(i=> (i+PRELUDE_FRAMES.length-1)%PRELUDE_FRAMES.length)}>Prev</button>
+              <div style={{display:'flex',gap:6}}>
+                {PRELUDE_FRAMES.map((_,i)=> <span key={i} style={{width:8,height:8,borderRadius:999,display:'inline-block',background: i===preludeIndex? '#79c0ff':'#3a4454'}}/>) }
+              </div>
+              <button className="mode" onClick={()=>setPreludeIndex(i=> (i+1)%PRELUDE_FRAMES.length)}>Next</button>
+            </div>
+            <div style={{display:'flex',justifyContent:'flex-end',marginTop:10}}>
+              <button className="mode" onClick={()=>{ setYear(-500_000); setShowPrelude(false); }}>Begin Sapiens</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
